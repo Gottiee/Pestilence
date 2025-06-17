@@ -22,24 +22,26 @@ help:
 $(NAME):	$(OBJS)
 	$(LD)  -o $(NAME) $(OBJS) 
 
-correction:	$(NAME)
-	@sh ./verbose.sh
+correction:
+	./asm-obfuscator.py srcs/pestilence.asm srcs/pestilence.inc obf.asm
+	mv obf.asm srcs
+	nasm -g -f elf64 srcs/obf.asm -o asm/obf.o
+	ld -o Pestilence asm/obf.o
+	sh verbose.sh
 
 %.o:%.asm
 	# $(NASM) -g -f elf64 -i srcs/ $< -o $@
 	$(NASM) -f elf64 -i srcs/ $< -o $@
 
-# strife:
-# 			nasm -f elf64 -i srcs/strife/ srcs/strife/strife.asm -o srcs/strife/strife.o && ld srcs/strife/strife.o -o Strife
-
 clean:
 	@if [ -d $(OBJS) ]; then\
 		rm -v $(OBJS);\
 	fi
+	rm -f *.o
 
 clean_dumps:
 	@if [ -f cl_dump ]; then\
-		rm -v cl_*;\
+		rm -rfv cl_*;\
 	fi
 	@if [ -f inf_dump ]; then\
 		rm -v inf_*;\
@@ -47,11 +49,11 @@ clean_dumps:
 
 fclean:		clean	clean_dumps
 	@if [ -d /tmp/test ]; then \
-		rm -r /tmp/test; \
+		rm -rf /tmp/test; \
 		echo "removed '\e[4;32m/tmp/test/'\e[0m"; \
 	fi
 	@if [ -d /tmp/test2 ]; then \
-		rm -r /tmp/test2; \
+		rm -rf /tmp/test2; \
 		echo "removed '\e[4;32m/tmp/test2/'\e[0m"; \
 	fi
 	@if [ -f $(NAME) ]; then \

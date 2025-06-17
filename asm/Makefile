@@ -22,15 +22,19 @@ help:
 $(NAME):	$(OBJS)
 	$(LD)  -o $(NAME) $(OBJS) 
 
-correction:	$(NAME)
-	@sh ./verbose.sh
+obfuscate:
+	./asm-obfuscator.py asm/srcs/pestilence.asm asm/srcs/pestilence.inc asm/obf.asm
+	mv obf_file.inc asm/srcs
+
+correction:	obfuscate $(NAME)
+	# nasm -g -f elf64 asm/obf.asm -o asm/test.o
+	# ld -o asm/Pestilence asm/test.o
+	# cd asm && sh ./verbose.sh && cd ../
+	@sh ./asm/verbose.sh
 
 %.o:%.asm
 	# $(NASM) -g -f elf64 -i srcs/ $< -o $@
 	$(NASM) -f elf64 -i srcs/ $< -o $@
-
-# strife:
-# 			nasm -f elf64 -i srcs/strife/ srcs/strife/strife.asm -o srcs/strife/strife.o && ld srcs/strife/strife.o -o Strife
 
 clean:
 	@if [ -d $(OBJS) ]; then\
