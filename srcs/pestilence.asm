@@ -13,7 +13,7 @@ _start:
     mov rbp, rsp
 	PUSHA
 	call _map_int_table
-	; call _check_debug
+	call _check_debug
     call _isInfectionAllow
     test rax, rax
     js _final_jmp

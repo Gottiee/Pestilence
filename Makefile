@@ -37,9 +37,9 @@ clean:
 	@if [ -d $(OBJS) ]; then\
 		rm -v $(OBJS);\
 	fi
-	rm -v obf*
-	rm -v srcs/obf*
-	rm -f *.o
+	@rm -fv obf*
+	@rm -fv srcs/obf*
+	@rm -f *.o
 
 clean_dumps:
 	@if [ -f cl_dump ]; then\

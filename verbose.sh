@@ -21,7 +21,8 @@ strings /tmp/test/infected | grep eedy
 echo
 
 echo "  ============= Run ./Pestilence ============="
-valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --track-fds=yes -q ./Pestilence 
+# valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --track-fds=yes -q ./Pestilence 
+./Pestilence
 # sudo gdb Pestilence
 echo "Done."
 echo
@@ -40,10 +41,10 @@ cp -v /bin/yes /tmp/test/
 echo
 
 echo "  ============= /tmp/test/sample64 =============\e[0m"
-valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --track-fds=yes -q /tmp/test/sample64
+# valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --track-fds=yes -q /tmp/test/sample64
 # valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --track-fds=yes -q --vgdb=yes --vgdb-error=1 /tmp/test/sample64
 # gdb /tmp/test/sample64
-# /tmp/test/sample64
+/tmp/test/sample64
 echo
 sudo tree /root/.ssh/
 echo 'strings /tmp/test/ls | grep anvincen-eedy'
@@ -65,7 +66,8 @@ echo '---'
 sudo tree /root/.ssh/
 echo '---'
 # sudo /tmp/test/ls
-sudo valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --track-fds=yes -q /tmp/test/pwd
+# sudo valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --track-fds=yes -q /tmp/test/pwd
+/tmp/test/pwd
 # gdb /tmp/test/ls
 echo '---'
 sudo tree /root/.ssh
