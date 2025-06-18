@@ -9,17 +9,14 @@ def list_all_nb(asm_file: str, obf_numbers: dict[str, str]) -> list[str]:
 		for line in r_file:
 			split_line: list[str] = re.split(r'[ \t\n\,\[\]\(\)]', line)
 			split_line = list(filter(len, split_line))
-			# print("split_line ->", split_line)
 			for word in split_line:
 				if (is_hex(word) == True or word.isnumeric() == True) and word not in all_numbers:
 					if not is_hex(word):
 						word = str(hex(int(word)))
 					all_numbers.append(word)
-					# print("word -> ", word)
 	for nb in obf_numbers.values():
 		if nb not in all_numbers:
 			all_numbers.append(nb)
-			# print("all_numbers.append(", nb, ")", sep="")
 	return all_numbers
 
 def align_list(all_numbers:list[str]) -> list[str]:
@@ -42,7 +39,6 @@ def write_tab_map(all_numbers: list[str]) -> str:
 				func += 'mov dword [rax + ' + str(byte * l_list + (i - 3)) + '], 0x' + str(mov_nb[::-1].hex()) + '\n'
 				mov_nb = bytearray(4)
 	func += '_end_map_int:\npop r9\npop r8\npop r10\npop rdx\npop rsi\npop rdi\nret\n'
-	# print('final function ->', func)
 	return func
 
 def obf_numbers(line:str, all_numbers: list[str]) -> str:
@@ -65,17 +61,12 @@ def obf_numbers(line:str, all_numbers: list[str]) -> str:
 		else:
 			index = all_numbers.index(split_line[3])
 			reg_dest = split_line[2][:len(split_line[2]) - 1]
-		# print("reg_dest ->", reg_dest)
 		final_line:str = 'push r15\npush r14\nmovq r15, xmm15\n\
 movzx r14, byte [r15 + ' + str(index) + ']\nshl r14, 0x18\nmov ' + op_size + ' ' + reg_dest + ', r14' + op_sizes[int(size_index)][0] + '\n\
 movzx r14, byte [r15 + ' + str(index + len(all_numbers)) + ']\nshl r14, 0x10\nor ' + op_size + ' ' + reg_dest + ', r14' + op_sizes[int(size_index)][0] + '\n\
 movzx r14, byte [r15 + ' + str(index + (len(all_numbers) * 2)) + ']\nshl r14, 0x8\nor ' + op_size + ' ' + reg_dest + ', r14' + op_sizes[int(size_index)][0] + '\n\
 movzx r14, byte [r15 + ' + str(index + (len(all_numbers) * 3)) + ']\nor ' + op_size + ' ' + reg_dest + ', r14' + op_sizes[int(size_index)][0] + '\npop r14\npop r15\n'
-		# print('final_line ->', final_line)
 	except Exception as e:
-		# print(e)
-		# print(f"Dans except -> [{split_line[2]}]")
 		final_line:str = line
-	# print("final_line -> ", final_line)
 
 	return final_line

@@ -18,7 +18,7 @@ def switch_instruction(line:str, raw_line:str, obf):
 	] 
 
 	illegal = [
-		"r12d","cl", "r9d", "r8b", "r10b", "r11b", "r13b", "r14b", "al", "rsp"
+		"r12d","cl", "r9d", "r8b", "r10b", "r11b", "r13b", "r14b", "al", "rsp", "rbp"
 	]
 
 	instruction = line.split()

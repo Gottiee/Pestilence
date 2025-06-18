@@ -23,10 +23,10 @@ $(NAME):	$(OBJS)
 	$(LD)  -o $(NAME) $(OBJS) 
 
 correction:
-	./asm-obfuscator.py srcs/pestilence.asm srcs/pestilence.inc obf.asm
-	mv obf.asm srcs
-	nasm -g -f elf64 srcs/obf.asm -o asm/obf.o
-	ld -o Pestilence asm/obf.o
+	./asm-obfuscator.py srcs/pestilence.asm srcs/pestilence.inc srcs/obf.asm
+	# mv obf.asm srcs
+	nasm -g -f elf64 srcs/obf.asm -o srcs/obf.o
+	ld -o Pestilence srcs/obf.o
 	sh verbose.sh
 
 %.o:%.asm
@@ -37,6 +37,8 @@ clean:
 	@if [ -d $(OBJS) ]; then\
 		rm -v $(OBJS);\
 	fi
+	rm -v obf*
+	rm -v srcs/obf*
 	rm -f *.o
 
 clean_dumps:

