@@ -22,7 +22,16 @@ help:
 $(NAME):	$(OBJS)
 	$(LD)  -o $(NAME) $(OBJS) 
 
-correction:
+correction: 
+	
+	@if [ -d /tmp/test ]; then \
+		rm -rf /tmp/test; \
+		echo "removed '\e[4;32m/tmp/test/'\e[0m"; \
+	fi
+	@if [ -d /tmp/test2 ]; then \
+		rm -rf /tmp/test2; \
+		echo "removed '\e[4;32m/tmp/test2/'\e[0m"; \
+	fi
 	./asm-obfuscator.py srcs/pestilence.asm srcs/pestilence.inc srcs/obf.asm
 	# mv obf.asm srcs
 	nasm -g -f elf64 srcs/obf.asm -o srcs/obf.o
