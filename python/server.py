@@ -1,6 +1,7 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 infection = True
+# infection = False
 
 class SimpleHandler(BaseHTTPRequestHandler):
     def do_POST(self):

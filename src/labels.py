@@ -30,6 +30,8 @@ def randomize_labels(file_name: str, obf_values: dict[str, str]):
 			line = line.strip()
 			if not line or line == "_start:":
 				continue
+			if line.startswith(';'):
+				continue
 			if line[-1] == ':' and line[:len(line) - 1] not in illegal:
 				obf_values[line[:len(line) - 1]] = generate_random_label(obf_values)
 			elif line_declares_var(line) == True:

