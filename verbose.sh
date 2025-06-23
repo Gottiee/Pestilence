@@ -21,8 +21,8 @@ strings /tmp/test/infected | grep eedy
 echo
 
 echo "  ============= Run ./Pestilence ============="
-valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --track-fds=yes -q ./Pestilence 
-# ./Pestilence
+# valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --track-fds=yes -q ./Pestilence 
+./Pestilence
 # sudo gdb Pestilence
 echo "Done."
 echo

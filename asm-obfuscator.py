@@ -94,7 +94,7 @@ def main (argv, argc):
 	new_file.close()
 	obf.insert_functions(argv[3])
 
-	randomize_labels(argv[3], obf_values)
+	# randomize_labels(argv[3], obf_values)
 	obf_string_line(argv[3], argv[3], argv[2], obf_values, str_key)
 	obf_include(argv[2], obf_values)
 

